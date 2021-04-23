@@ -3,18 +3,16 @@
  */
 package com.ss.course.jb.part1;
 
-import java.lang.Math;
-
 /**
  * Print 4 different types of triangles
- * @author ecolv
+ * @author Eric Colvin
  *
  */
 public class Triangles {
 
 	/**
 	 * Calls each of the 4 triangle methods with 4 rows 
-	 * @param args - command line arguments (unused)
+	 * @param args - Command line arguments (unused)
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
