@@ -1,0 +1,9 @@
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz
+1234567890!@#$%^&*()-_=+{}[]\|;:'",<.>/?`~
+
+This is a paragraph that I typed to have a bunch of various letters and symbols for the program to count. 
+It cost me $0.00 to make which I only mention so that I can have a '$' in it!!! 
+How am I supposed to add the rest of the symbols though?? 
+(I won't know the exact # of each thing in this file, so I'll have to manually check if it's right each time.)
+74 + -54 = (80/8)*2

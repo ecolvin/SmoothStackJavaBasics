@@ -15,7 +15,7 @@ public class CommandSum {
 	 * @param args - List of numbers to add together
 	 */
 	public static void main(String[] args) {
-		int sum = 0;
+		Integer sum = 0;
 		for(int i = 0; i < args.length; i++) {
 			try	{
 				sum += Integer.parseInt(args[i]);
