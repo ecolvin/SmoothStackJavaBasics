@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.ss.course.jb.project;
+package com.ss.course.jb.capstone;
 
 import org.junit.Test;
 
