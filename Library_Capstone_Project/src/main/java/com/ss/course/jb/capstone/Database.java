@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
+ * An interface between our app and the mySQL database
  * @author Eric Colvin
  *
  */
@@ -28,24 +29,24 @@ public class Database {
 	final private String passwd = "Java_Basics_Pa$$word";
 	final private String database = "library";
 	
+	/**
+	 * Startup function to initialize the database
+	 * @throws Exception - Throws an exception if something goes wrong initializing the database
+	 */
 	public void connectToDB() throws Exception {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			connect = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database + "?" + "user=" + user + "&password=" + passwd);
 		} catch (Exception e) {
 			throw e;
-		}	
-		
-
-		/*Scanner input = new Scanner(System.in);
-		while(true) {
-			String test = input.nextLine();
-			test = escapeBadChars(test);
-			System.out.println(test);
-		}*/
-		
+		}		
 	}
 	
+	/**
+	 * Retrieves the query of all entries in tbl_book and turns it into an ArrayList of Books and returns it
+	 * @return - ArrayList of Book objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<Book> getBooks() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -64,6 +65,12 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Queries the database for a book with the specified bookId and returns it
+	 * @param bookId - The bookId for the query
+	 * @return - The queried book or null if no book was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Book getBook(int bookId) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -83,6 +90,13 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Adds an entry to the tbl_book table with the specified values and a bookId one larger than the current max bookId
+	 * @param title - The title of the new book
+	 * @param authId - The Foreign Key for the author of the new book
+	 * @param pubId - The Foreign Key for the publisher of the new book
+	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 */
 	public void addBook(String title, int authId, int pubId) throws Exception {
 		title = escapeBadChars(title);
 		try {
@@ -104,7 +118,16 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Updates the specified entry in the tbl_book table to the specified values
+	 * @param bookId - The Primary Key of the entry to be updated
+	 * @param title - The new title of the book entry
+	 * @param authId - The Foreign Key for the new author of the book entry
+	 * @param pubId - The Foreign Key for the new publisher of the book entry
+	 * @return - Returns -1 if either the author or publisher could not be found in the database or 0 otherwise
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public int updateBook(int bookId, String title, int authId, int pubId) throws Exception {
 		title = escapeBadChars(title);
 		try {
@@ -122,7 +145,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Deletes the specified entry from the tbl_book table
+	 * @param bookId - The Primary Key of the entry to be deleted
+	 * @throws Exception - Throws an exception if something goes wrong with the delete statement
+	 */
 	public void deleteBook(int bookId) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -134,7 +162,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Retrieves the query of all entries in tbl_author and turns it into an ArrayList of Authors and returns it
+	 * @return - ArrayList of Author objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<Author> getAuthors() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -150,7 +183,13 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Queries the database for an author with the specified authorId and returns it
+	 * @param authorId - The authorId for the query
+	 * @return - The queried author or null if no author was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Author getAuthor(int authorId) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -166,7 +205,13 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Queries the database for an author with the specified name and returns it
+	 * @param authorName - The authorName for the query
+	 * @return - The queried author or null if no author was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Author getAuthor(String authorName) throws Exception{
 		authorName = escapeBadChars(authorName);
 		try {
@@ -183,7 +228,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Adds an entry to the tbl_author table with the specified values and an authorId one larger than the current max authorId
+	 * @param name - The name of the new author
+	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 */
 	public void addAuthor(String name) throws Exception {
 		name = escapeBadChars(name);
 		try {
@@ -205,7 +255,14 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Updates the specified entry in the tbl_author table to the specified values
+	 * @param authorId - The Primary Key of the entry to be updated
+	 * @param name - The new name of the author entry
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void updateAuthor(int authorId, String name) throws Exception {
 		name = escapeBadChars(name);
 		try {
@@ -219,7 +276,13 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Deletes the specified entry from the tbl_author table
+	 * @param authorId - The Primary Key of the entry to be deleted
+	 * @throws Exception - Throws an exception if something goes wrong with the delete statement
+	 */
 	public void deleteAuthor(int authorId) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -231,7 +294,13 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Retrieves the query of all entries in tbl_publisher and turns it into an ArrayList of Publishers and returns it
+	 * @return - ArrayList of Publisher objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<Publisher> getPublishers() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -249,7 +318,14 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Queries the database for a publisher with the specified publisherId and returns it
+	 * @param publisherId - The publisherId for the query
+	 * @return - The queried publisher or null if no publisher was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Publisher getPublisher(int publisherId) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -267,7 +343,14 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Queries the database for a publisher with the specified name and returns it
+	 * @param publisherName - The publisherName for the query
+	 * @return - The queried publisher or null if no publisher was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Publisher getPublisher(String publisherName) throws Exception{
 		publisherName = escapeBadChars(publisherName);
 		try {
@@ -286,7 +369,15 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Adds an entry to the tbl_publisher table with the specified values and a publisherId one larger than the current max publisherId
+	 * @param name - The name of the new publisher
+	 * @param address - The location of the new publisher
+	 * @param phone - The contact info of the new publisher
+	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 */
 	public void addPublisher(String name, String address, String phone) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
@@ -310,7 +401,16 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Updates the specified entry in the tbl_publisher table to the specified values
+	 * @param publisherId - The Primary Key of the entry to be updated
+	 * @param name - The new name of the publisher
+	 * @param address - The new location of the publisher
+	 * @param phone - The new contact info of the publisher
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void updatePublisher(int publisherId, String name, String address, String phone) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
@@ -326,7 +426,13 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Deletes the specified entry from the tbl_publisher table
+	 * @param publisherId - The Primary Key of the entry to be deleted
+	 * @throws Exception - Throws an exception if something goes wrong with the delete statement
+	 */
 	public void deletePublisher(int publisherId) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -338,7 +444,13 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Retrieves the query of all entries in tbl_library_branch and turns it into an ArrayList of Branch objects and returns it
+	 * @return - ArrayList of Branch objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<Branch> getBranches() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -355,7 +467,14 @@ public class Database {
 			throw e;
 		}
 	}
+
 	
+	/**
+	 * Queries the database for a branch with the specified branchId and returns it
+	 * @param branchId - The branchId for the query
+	 * @return - The queried branch or null if no branch was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Branch getBranch(int branchId) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -373,6 +492,13 @@ public class Database {
 		}
 	}
 	
+
+	/**
+	 * Adds an entry to the tbl_library_branch table with the specified values and a branchId one larger than the current max branchId
+	 * @param name - The name of the new branch
+	 * @param address - The location of the new branch
+	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 */
 	public void addBranch(String name, String address) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
@@ -395,7 +521,14 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Updates the specified entry in the tbl_library_branch table to the specified values
+	 * @param branchId - The Primary Key of the entry to be updated
+	 * @param name - The new name of the branch
+	 * @param address - The new location of the branch
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void updateBranch(int branchId, String name, String address) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
@@ -410,7 +543,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Deletes the specified entry from the tbl_library_branch table
+	 * @param branchId - The Primary key of the entry to be deleted
+	 * @throws Exception - Throws an exception if something goes wrong with the delete statement
+	 */
 	public void deleteBranch(int branchId) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -422,7 +560,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Retrieves the query of all entries in tbl_borrower and turns it into an ArrayList of Borrower objects and returns it
+	 * @return - ArrayList of Borrower objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<Borrower> getBorrowers() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -440,7 +583,13 @@ public class Database {
 			throw e;
 		}
  	}
-	
+
+	/**
+	 * Queries the database for a borrower with the specified cardNo and returns it
+	 * @param cardNo - The cardNo for the query
+	 * @return - The queried borrower or null if no borrower was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Borrower getBorrower(int cardNo) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -458,7 +607,15 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Adds an entry to the tbl_borrower table with the specified values and a cardNo one larger than the current max cardNo
+	 * @param name - The name of the new borrower
+	 * @param address - The location of the new borrower
+	 * @param phone - The contact info of the new borrower
+	 * @return - Returns the card number of the new borrower to simulate printing out a new library card
+	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 */
 	public int addBorrower(String name, String address, String phone) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
@@ -483,7 +640,15 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Updates the specified entry in the tbl_borrower table to the specified values
+	 * @param cardNo - The Primary Key of the entry to be updated 
+	 * @param name - The new name of the borrower
+	 * @param address - The new location of the borrower
+	 * @param phone - The new contact info of the borrower
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void updateBorrower(int cardNo, String name, String address, String phone) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
@@ -499,7 +664,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Deletes the specified entry from the tbl_borrower table
+	 * @param cardNo - The Primary Key of the entry to be deleted
+	 * @throws Exception - Throws an exception if something goes wrong with the delete statement
+	 */
 	public void deleteBorrower(int cardNo) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -511,7 +681,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Retrieves the query of all entries in tbl_book_loans and turns it into an ArrayList of Loan objects and returns it
+	 * @return - ArrayList of Loan objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<Loan> getLoans() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -530,7 +705,15 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Queries the database for a book loan with the specified branchId, bookId, and cardNo and returns it
+	 * @param branchId - The branchId for the query
+	 * @param bookId - The bookId for the query
+	 * @param cardNo - The cardNo for the query
+	 * @return - The queried book loan or null if no book loan was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public Loan getBookLoan(int branchId, int bookId, int cardNo) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -549,7 +732,14 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Adds an entry to the tbl_book_loans table with the specified values and decrements the respective entry in the tbl_book_copies table
+	 * @param branchId - The Foreign Key of the branch the book is being borrowed from
+	 * @param bookId - The Foreign Key of the book that is being borrowed
+	 * @param cardNo - The Foreign Key of the borrower who is borrowing the book
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void addBookLoan(int branchId, int bookId, int cardNo) throws Exception {
 		DateTimeFormatter sqlDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime curDate = LocalDateTime.now();
@@ -567,7 +757,14 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Deletes the specified entry from the tbl_book_loans table
+	 * @param branchId - The Branch's Foreign Key of the entry to be deleted
+	 * @param bookId - The Book's Foreign Key of the entry to be deleted
+	 * @param cardNo - The Borrower's Foreign Key of the entry to be deleted
+	 * @throws Exception - Throws an exception if something goes wrong with the delete statement
+	 */
 	public void deleteBookLoan(int branchId, int bookId, int cardNo) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -580,7 +777,12 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Retrieves the query of all entries in tbl_book_copies and turns it into an ArrayList of BookCopy objects and returns it
+	 * @return - ArrayList of BookCopy objects retrieved from the database
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public List<BookCopy> getBookCopies() throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -597,7 +799,14 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Queries the database for a book copy entry with the specified branchId and bookId and returns it
+	 * @param branchId - The branchId for the query
+	 * @param bookId - The bookId for the query
+	 * @return - The queried book copy entry or null if no book copy entry was found
+	 * @throws Exception - Throws an exception if something goes wrong with the query
+	 */
 	public BookCopy getBookCopy(int branchId, int bookId) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -614,7 +823,33 @@ public class Database {
 			throw e;
 		}
 	}
+
+	/**
+	 * Adds an entry to the tbl_book_copies table with the specified values
+	 * @param branchId - The branch of the new entry
+	 * @param bookId - The book of the new entry
+	 * @param noOfCopies - The number of copies of the book in the branch
+	 * @throws Exception - Throws an exception if something goes wrong with the insert into statement 
+	 */
+	public void addBookCopy(int branchId, int bookId, int noOfCopies) throws Exception {
+		try {
+			statement = connect.createStatement();
+			statement.executeUpdate(
+					  "Insert Into " + database + ".tbl_book_copies (bookId, branchId, noOfCopies) "
+					+ "Values (" + bookId + ", " + branchId + ", " + noOfCopies + ")" 
+			);
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 	
+	/**
+	 * Update the specified entry in the tbl_book_copies table to have the specified value for noOfCopies
+	 * @param branchId - The Foreign Key of the specified branch
+	 * @param bookId - The Foreign Key of the specified book
+	 * @param noOfCopies - The new number of copies of the specified book at the specified branch
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void updateBookCopies(int branchId, int bookId, int noOfCopies) throws Exception {
 		try {
 			statement = connect.createStatement();
@@ -627,7 +862,14 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * Update the specified bookLoan entry in the database so that it has no due date (set to 12/31/9999)
+	 * @param bookId - The bookId of the book that was checked out
+	 * @param branchId - The branchId of the branch the book was checked out from
+	 * @param cardNo - The cardNo of the borrower who checked out the book
+	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 */
 	public void overrideDueDate(int bookId, int branchId, int cardNo) throws Exception{
 		try {
 			statement = connect.createStatement();
@@ -640,14 +882,22 @@ public class Database {
 			throw e;
 		}
 	}
-	
+
+	/**
+	 * A simple function to escape all relevant characters in a string before passing them into an SQL query
+	 * @param s - A string to escape characters in
+	 * @return - The string with all the relevant characters escaped
+	 */
 	public String escapeBadChars(String s) {
 		s = s.replace("\\", "\\\\");
 		s = s.replace("\'", "\\\'");
 		s = s.replace("\"", "\\\"");
 		return s;
 	}
-	
+
+	/**
+	 * Function to clean up and close the database before the project exits
+	 */
 	public void close() {
 		try {
 			if (resultSet != null) {

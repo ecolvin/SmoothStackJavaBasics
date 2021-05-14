@@ -290,12 +290,15 @@ public class Main {
 	 * @param bookId - the id of the selected book
 	 */
 	public static void getNumCopies(Scanner input, int branchId, int bookId) {
+		Boolean newEntry = false;
 		BookCopy bc;
 		int numCopies = 0;
 		try {
 			bc = db.getBookCopy(branchId, bookId);
 			if(bc != null) {
 				numCopies = bc.getNoOfCopies();
+			} else {
+				newEntry = true;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -307,8 +310,9 @@ public class Main {
 		System.out.println();
 		System.out.println("Enter new number of copies:");
 		System.out.println();
+		int newNumCopies = 0;
 		try {
-			numCopies = input.nextInt();
+			newNumCopies = input.nextInt();
 		}catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			getNumCopies(input, branchId, bookId);
@@ -316,7 +320,11 @@ public class Main {
 		}
 		
 		try {
-			db.updateBookCopies(branchId, bookId, numCopies);
+			if(!newEntry) {
+				db.updateBookCopies(branchId, bookId, newNumCopies);
+			} else {
+				db.addBookCopy(branchId, bookId, newNumCopies);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			db.close();
@@ -327,7 +335,10 @@ public class Main {
 		return;
 	}
 	
-	
+	/**
+	 * Prompt the user to input their library card number to verify their identity and pass their cardNo to borr1
+	 * @param input - Scanner for user input
+	 */
 	public static void borr(Scanner input) {
 		System.out.println("Enter your Card Number:");
 		int cardNo = 0;
@@ -354,6 +365,11 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Prompts the user to select whether they want to check out or return a book and call the respective function
+	 * @param input - Scanner for user input
+	 * @param cardNo - User's card number - their primary key in the tbl_borrower table
+	 */
 	public static void borr1(Scanner input, int cardNo) {
 		System.out.println("\t1. Check out a book");
 		System.out.println("\t2. Return a book");
@@ -386,6 +402,11 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Displays the list of all branches and prompts the user to select one to check out a book from
+	 * @param input - Scanner for user input
+	 * @param cardNo - User's card number - their primary key in the tbl_borrower table
+	 */
 	public static void borrCheckOutBranch(Scanner input, int cardNo) {
 		List<Branch> branches;
 		try {
@@ -425,6 +446,12 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Displays the list of all books available at the given branch and prompts them to select one to check out
+	 * @param input - Scanner for user input
+	 * @param cardNo - User's card number - their primary key in the tbl_borrower table
+	 * @param branchId - The branchId of the branch the user wants to check a book out from
+	 */
 	public static void borrCheckOutBook(Scanner input, int cardNo, int branchId) {
 		List<Book> books;
 		try {
@@ -491,7 +518,12 @@ public class Main {
 		borrCheckOutBranch(input, cardNo);
 		return;
 	}
-	
+
+	/**
+	 * Displays the list of all branches and prompts the user to select one to return a book to
+	 * @param input - Scanner for user input
+	 * @param cardNo - User's card number - their primary key in the tbl_borrower table
+	 */
 	public static void borrReturnBranch(Scanner input, int cardNo) {
 		List<Branch> branches;
 		try {
@@ -530,7 +562,13 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Displays the list of all books the user has checked out from the given branch and prompts them to select one to return
+	 * @param input - Scanner for user input
+	 * @param cardNo - User's card number - their primary key in the tbl_borrower table
+	 * @param branchId - The branchId of the branch the user wants to return a book to
+	 */
 	public static void borrReturnBook(Scanner input, int cardNo, int branchId) {
 		List<Book> books;
 		try {
@@ -605,9 +643,13 @@ public class Main {
 		borrReturnBranch(input, cardNo);
 		return;
 	}
-	
+
+	/**
+	 * Prompts the user to enter the administrative password in order to proceed
+	 * @param input - Scanner for user input
+	 */
 	public static void admin(Scanner input) {
-		final String PASSWORD = "Java_Basics_Pa$$word";
+		final String PASSWORD = "Java_Basics_Pa$$word";  //Administrative password
 		System.out.println("Please enter the admin password (enter \'quit\' to quit):");
 		String pass = input.nextLine();
 		if(PASSWORD.equals(pass)) {
@@ -622,7 +664,11 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Prompts the admin to select what action they want to do (Add, Update, Delete, or Override a Due Date)
+	 * @param input - Scanner for user input
+	 */
 	public static void admin1(Scanner input) {
 		System.out.println("What would you like to do:");
 		System.out.println();
@@ -662,7 +708,11 @@ public class Main {
 				return;
 		}
 	}
-	
+
+	/**
+	 * Prompts the admin to select which table to add to
+	 * @param input - Scanner for user input
+	 */
 	public static void adminAdd(Scanner input) {
 		System.out.println("Which table would you like to add to:");
 		System.out.println();
@@ -711,7 +761,11 @@ public class Main {
 				return;
 		}		
 	}
-	
+
+	/**
+	 * Prompts the admin to select which table to update and entry from
+	 * @param input - Scanner for user input
+	 */
 	public static void adminUpdate(Scanner input) {
 		System.out.println("Which table would you like to update:");
 		System.out.println();
@@ -760,7 +814,11 @@ public class Main {
 				return;
 		}		
 	}
-	
+
+	/**
+	 * Prompts the admin to select which table to delete from
+	 * @param input - Scanner for user input
+	 */
 	public static void adminDelete(Scanner input) {
 		System.out.println("Which table would you like to delete from:");
 		System.out.println();
@@ -804,7 +862,11 @@ public class Main {
 				return;
 		}		
 	}
-	
+
+	/**
+	 * Gets the user input for the title of the new book entry
+	 * @param input - Scanner for user input
+	 */
 	public static void adminAddBookTitle(Scanner input) {
 		System.out.println("What is the title of the book (enter \'quit\' to quit):");
 		String title = input.nextLine();
@@ -816,7 +878,12 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the name of the new book's author and verifies that they exist in the database
+	 * @param input - Scanner for user input
+	 * @param title - The title of the book to be added
+	 */
 	public static void adminAddBookAuthor(Scanner input, String title) {
 		System.out.println("What is the name of the book's author (enter \'quit\' to quit):");
 		String author = input.nextLine();
@@ -843,7 +910,13 @@ public class Main {
 			}
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the name of the new book's publisher and verifies that they exist in the database
+	 * @param input - Scanner for user input
+	 * @param title - The title of the book to be added
+	 * @param authorId - The authorId of the author of the book
+	 */
 	public static void adminAddBookPublisher(Scanner input, String title, int authorId) {
 		System.out.println("What is the name of the book's publisher (enter \'quit\' to quit):");
 		String publisher = input.nextLine();
@@ -870,7 +943,11 @@ public class Main {
 		adminAdd(input);
 		return;
 	}
-	
+
+	/**
+	 * Gets the user input for the values of the new author entry
+	 * @param input - Scanner for user input
+	 */
 	public static void adminAddAuthor(Scanner input) {
 		System.out.println("What is the name of the author (enter \'quit\' to quit):");
 		String authorName = input.nextLine();
@@ -893,7 +970,11 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the values of the new publisher entry
+	 * @param input - Scanner for user input
+	 */
 	public static void adminAddPublisher(Scanner input) {
 		System.out.println("What is the name of the publisher (enter \'quit\' to quit):");
 		String publisherName = input.nextLine();
@@ -920,7 +1001,11 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the values of the new branch entry
+	 * @param input - Scanner for user input
+	 */
 	public static void adminAddBranch(Scanner input) {
 		System.out.println("What is the name of the branch (enter \'quit\' to quit):");
 		String branchName = input.nextLine();
@@ -945,7 +1030,11 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the values of the new borrower entry
+	 * @param input - Scanner for user input
+	 */
 	public static void adminAddBorrower(Scanner input) {
 		System.out.println("What is the name of the borrower (enter \'quit\' to quit):");
 		String borrowerName = input.nextLine();
@@ -974,7 +1063,11 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_book table and the admin picks one to update
+	 * @param input - Scanner for user input
+	 */
 	public static void adminUpdateBook(Scanner input) {
 		List<Book> books;
 		try {
@@ -1027,7 +1120,12 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the new values of the updated book entry
+	 * @param input - Scanner for user input
+	 * @param bookId - The bookId for the book entry that the user wants to update
+	 */
 	public static void adminUpdateBookInput(Scanner input, int bookId) {
 		Book b;
 		String bookName;
@@ -1097,7 +1195,11 @@ public class Main {
 		adminUpdateBook(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_author table and the admin picks one to update
+	 * @param input - Scanner for user input
+	 */
 	public static void adminUpdateAuthor(Scanner input) {
 		List<Author> authors;
 		try {
@@ -1137,7 +1239,12 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the new values of the updated author entry
+	 * @param input - Scanner for user input
+	 * @param authorId - The authorId for the author entry that the user wants to update
+	 */
 	public static void adminUpdateAuthorInput(Scanner input, int authorId) {
 		String authorName;
 		try {
@@ -1167,7 +1274,11 @@ public class Main {
 		adminUpdateAuthor(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_publisher table and the admin picks one to update
+	 * @param input - Scanner for user input
+	 */
 	public static void adminUpdatePublisher(Scanner input) {
 		List<Publisher> publishers;
 		try {
@@ -1207,7 +1318,12 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the new values of the updated publisher entry
+	 * @param input - Scanner for user input
+	 * @param publisherId - The publisherId for the publisher entry that the user wants to update
+	 */
 	public static void adminUpdatePublisherInput(Scanner input, int publisherId) {
 		String publisherName;
 		String publisherAddress;
@@ -1251,7 +1367,11 @@ public class Main {
 		adminUpdatePublisher(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_branch table and the admin picks one to update
+	 * @param input - Scanner for user input
+	 */
 	public static void adminUpdateBranch(Scanner input) {
 		List<Branch> branches;
 		try {
@@ -1291,7 +1411,12 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the new values of the updated branch entry
+	 * @param input - Scanner for user input
+	 * @param branchId - The branchId for the branch entry that the user wants to update
+	 */
 	public static void adminUpdateBranchInput(Scanner input, int branchId) {
 		String branchName;
 		String branchAddress;
@@ -1328,7 +1453,11 @@ public class Main {
 		adminUpdateBranch(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_borrower table and the admin picks one to update
+	 * @param input - Scanner for user input
+	 */
 	public static void adminUpdateBorrower(Scanner input) {
 		List<Borrower> borrowers;
 		try {
@@ -1368,7 +1497,12 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Gets the user input for the new values of the updated borrower entry
+	 * @param input - Scanner for user input
+	 * @param cardNo - The cardNo for the borrower entry that the user wants to update
+	 */
 	public static void adminUpdateBorrowerInput(Scanner input, int cardNo) {
 		String borrowerName;
 		String borrowerAddress;
@@ -1412,7 +1546,11 @@ public class Main {
 		adminUpdateBorrower(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_book table and the admin picks one to delete
+	 * @param input - Scanner for user input
+	 */
 	public static void adminDeleteBook(Scanner input) {
 		List<Book> books;
 		try {
@@ -1471,7 +1609,11 @@ public class Main {
 		adminDeleteBook(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_author table and the admin picks one to delete
+	 * @param input - Scanner for user input
+	 */
 	public static void adminDeleteAuthor(Scanner input) {
 		List<Author> authors;
 		try {
@@ -1517,7 +1659,11 @@ public class Main {
 		adminDeleteAuthor(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_publisher table and the admin picks one to delete
+	 * @param input - Scanner for user input
+	 */
 	public static void adminDeletePublisher(Scanner input) {
 		List<Publisher> publishers;
 		try {
@@ -1563,7 +1709,11 @@ public class Main {
 		adminDeletePublisher(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_library_branch table and the admin picks one to delete
+	 * @param input - Scanner for user input
+	 */
 	public static void adminDeleteBranch(Scanner input) {
 		List<Branch> branches;
 		try {
@@ -1609,7 +1759,11 @@ public class Main {
 		adminDeleteBranch(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_borrower table and the admin picks one to delete
+	 * @param input - Scanner for user input
+	 */
 	public static void adminDeleteBorrower(Scanner input) {
 		List<Borrower> borrowers;
 		try {
@@ -1655,7 +1809,11 @@ public class Main {
 		adminDeleteBorrower(input);
 		return;
 	}
-	
+
+	/**
+	 * Displays all entries from the tbl_book_loans table and the admin picks one to override the due date of
+	 * @param input - Scanner for user input
+	 */
 	public static void adminOverrideDueDate(Scanner input) {
 		List<Loan> loans;
 		try {
@@ -1704,7 +1862,14 @@ public class Main {
 			return;
 		}
 	}
-	
+
+	/**
+	 * Updates the chosen book loan so it no longer has a due date (Sets it to 12/31/9999)
+	 * @param input - Scanner for user input
+	 * @param bookId - The bookId of the book that was checked out
+	 * @param branchId - The branchId of the branch that was checked out from
+	 * @param cardNo - The cardNo of the borrower who checked out the book
+	 */
 	public static void adminOverrideDueDateInput(Scanner input, int bookId, int branchId, int cardNo) {
 		String bookName;
 		String branchName;
@@ -1742,3 +1907,6 @@ public class Main {
 		return;
 	}
 }  
+
+
+
