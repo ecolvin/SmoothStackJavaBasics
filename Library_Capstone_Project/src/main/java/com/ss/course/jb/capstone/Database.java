@@ -12,8 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.Scanner;
-
 /**
  * An interface between our app and the mySQL database
  * @author Eric Colvin
@@ -33,10 +31,15 @@ public class Database {
 	 * Startup function to initialize the database
 	 * @throws Exception - Throws an exception if something goes wrong initializing the database
 	 */
-	public void connectToDB() throws Exception {
+	public int connectToDB() throws Exception {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			connect = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database + "?" + "user=" + user + "&password=" + passwd);
+			if(connect != null) {
+				return 0;
+			} else {
+				return -1;
+			}
 		} catch (Exception e) {
 			throw e;
 		}		
@@ -50,7 +53,7 @@ public class Database {
 	public List<Book> getBooks() throws Exception {
 		try {
 			statement = connect.createStatement();
-			resultSet = statement.executeQuery("Select * from " + database + ".tbl_book");
+			resultSet = statement.executeQuery("Select * from " + database + ".tbl_book order by bookId");
 			List<Book> books = new ArrayList<Book>();
 			while(resultSet.next()) {
 				int id = resultSet.getInt("bookId");
@@ -96,8 +99,9 @@ public class Database {
 	 * @param authId - The Foreign Key for the author of the new book
 	 * @param pubId - The Foreign Key for the publisher of the new book
 	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 * @return - Returns the bookId of the newly created entry
 	 */
-	public void addBook(String title, int authId, int pubId) throws Exception {
+	public int addBook(String title, int authId, int pubId) throws Exception {
 		title = escapeBadChars(title);
 		try {
 			statement = connect.createStatement();
@@ -114,6 +118,7 @@ public class Database {
 					  "Insert Into " + database + ".tbl_book (bookId, title, authId, pubId) "
 					+ "Values (" + bookId + ", \'" + title + "\', " + authId + ", " + pubId + ")" 
 			);
+			return bookId;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -171,7 +176,7 @@ public class Database {
 	public List<Author> getAuthors() throws Exception {
 		try {
 			statement = connect.createStatement();
-			resultSet = statement.executeQuery("Select * from " + database + ".tbl_author");
+			resultSet = statement.executeQuery("Select * from " + database + ".tbl_author order by authorId");
 			List<Author> authors = new ArrayList<Author>();
 			while(resultSet.next()) {
 				int id = resultSet.getInt("authorId");
@@ -233,8 +238,9 @@ public class Database {
 	 * Adds an entry to the tbl_author table with the specified values and an authorId one larger than the current max authorId
 	 * @param name - The name of the new author
 	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 * @return - Returns the authorId of the newly created entry
 	 */
-	public void addAuthor(String name) throws Exception {
+	public int addAuthor(String name) throws Exception {
 		name = escapeBadChars(name);
 		try {
 			statement = connect.createStatement();
@@ -251,6 +257,7 @@ public class Database {
 					  "Insert Into " + database + ".tbl_author (authorId, authorName) "
 					+ "Values (" + authId + ", \'" + name + "\')" 
 			);
+			return authId;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -304,7 +311,7 @@ public class Database {
 	public List<Publisher> getPublishers() throws Exception {
 		try {
 			statement = connect.createStatement();
-			resultSet = statement.executeQuery("Select * from " + database + ".tbl_publisher");
+			resultSet = statement.executeQuery("Select * from " + database + ".tbl_publisher order by publisherId");
 			List<Publisher> publishers = new ArrayList<Publisher>();
 			while(resultSet.next()) {
 				int id = resultSet.getInt("publisherId");
@@ -377,8 +384,9 @@ public class Database {
 	 * @param address - The location of the new publisher
 	 * @param phone - The contact info of the new publisher
 	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 * @return - Returns the pubId of the newly created entry
 	 */
-	public void addPublisher(String name, String address, String phone) throws Exception {
+	public int addPublisher(String name, String address, String phone) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
 		phone = escapeBadChars(phone);
@@ -397,6 +405,7 @@ public class Database {
 					  "Insert Into " + database + ".tbl_publisher (publisherId, publisherName, publisherAddress, publisherPhone) "
 					+ "Values (" + pubId + ", \'" + name + "\', \'" + address + "\', \'" + phone + "\')" 
 			);
+			return pubId;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -454,7 +463,7 @@ public class Database {
 	public List<Branch> getBranches() throws Exception {
 		try {
 			statement = connect.createStatement();
-			resultSet = statement.executeQuery("Select * from " + database + ".tbl_library_branch");
+			resultSet = statement.executeQuery("Select * from " + database + ".tbl_library_branch order by branchId");
 			List<Branch> branches = new ArrayList<Branch>();
 			while(resultSet.next()) {
 				int id = resultSet.getInt("branchId");
@@ -498,8 +507,9 @@ public class Database {
 	 * @param name - The name of the new branch
 	 * @param address - The location of the new branch
 	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 * @return - Returns the branchId of the newly created entry
 	 */
-	public void addBranch(String name, String address) throws Exception {
+	public int addBranch(String name, String address) throws Exception {
 		name = escapeBadChars(name);
 		address = escapeBadChars(address);
 		try {
@@ -517,6 +527,7 @@ public class Database {
 					  "Insert Into " + database + ".tbl_library_branch (branchId, branchName, branchAddress) "
 					+ "Values (" + branchId + ", \'" + name + "\', \'" + address + "\')" 
 			);
+			return branchId;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -569,7 +580,7 @@ public class Database {
 	public List<Borrower> getBorrowers() throws Exception {
 		try {
 			statement = connect.createStatement();
-			resultSet = statement.executeQuery("Select * from " + database + ".tbl_borrower");
+			resultSet = statement.executeQuery("Select * from " + database + ".tbl_borrower order by cardNo");
 			List<Borrower> borrowers = new ArrayList<Borrower>();
 			while(resultSet.next()) {
 				int cardNo = resultSet.getInt("cardNo");
@@ -613,8 +624,8 @@ public class Database {
 	 * @param name - The name of the new borrower
 	 * @param address - The location of the new borrower
 	 * @param phone - The contact info of the new borrower
-	 * @return - Returns the card number of the new borrower to simulate printing out a new library card
 	 * @throws Exception - Throws an exception if something goes wrong with the query or insert into statement
+	 * @return - Returns the cardNo of the newly created entry
 	 */
 	public int addBorrower(String name, String address, String phone) throws Exception {
 		name = escapeBadChars(name);
@@ -739,8 +750,9 @@ public class Database {
 	 * @param bookId - The Foreign Key of the book that is being borrowed
 	 * @param cardNo - The Foreign Key of the borrower who is borrowing the book
 	 * @throws Exception - Throws an exception if something goes wrong with the update statement
+	 * @return - Returns the due date of the book
 	 */
-	public void addBookLoan(int branchId, int bookId, int cardNo) throws Exception {
+	public String addBookLoan(int branchId, int bookId, int cardNo) throws Exception {
 		DateTimeFormatter sqlDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime curDate = LocalDateTime.now();
 	    String dateOut = curDate.format(sqlDateTime);
@@ -753,6 +765,7 @@ public class Database {
 					"Values (" + bookId + ", " + branchId + ", " + cardNo + ", \'" + dateOut + "\', \'" + dueDate + "\')"		
 			);
 			updateBookCopies(branchId, bookId, getBookCopy(branchId, bookId).getNoOfCopies()-1);
+			return dueDate;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -888,7 +901,7 @@ public class Database {
 	 * @param s - A string to escape characters in
 	 * @return - The string with all the relevant characters escaped
 	 */
-	public String escapeBadChars(String s) {
+	private String escapeBadChars(String s) {
 		s = s.replace("\\", "\\\\");
 		s = s.replace("\'", "\\\'");
 		s = s.replace("\"", "\\\"");

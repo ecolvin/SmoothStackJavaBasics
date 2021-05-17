@@ -10,21 +10,39 @@ import java.util.Scanner;
  * A simple Library Management System
  * @author Eric Colvin
  */
-public class Main {
+public class LibraryConsole {
 
 	private static Database db = new Database();
 	
 	/**
-	 * Print a welcome message and then call the getUserCat method to prompt the user for their category
-	 * @param args - Command Line arguments (unused)
+	 * Initialize the database object (Separate function so tests can initialize the database without calling main)
 	 */
-	public static void main(String[] args) {
+	public static void initDatabase() {
 		try {
 			db.connectToDB();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
+	}
+	
+	/**
+	 * Close the database object
+	 */
+	public static void closeDatabase() {
+		db.close();
+	}
+	
+	/**
+	 * Print a welcome message and then call the getUserCat method to prompt the user for their category
+	 * @param args - Command Line arguments (unused)
+	 */
+	public static void main(String[] args) {
+		initDatabase();
+		startConsole();
+	}
+	
+	public static void startConsole() {
 		System.out.print("Welcome to the GCIT Library Management System. ");
 		getUserCat(new Scanner(System.in));
 		return;
@@ -44,7 +62,7 @@ public class Main {
 		System.out.println();
 		int userCat = 0;
 		try {
-			userCat = input.nextInt();
+			userCat = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			getUserCat(input);
@@ -55,14 +73,27 @@ public class Main {
 				lib1(input);
 				return;
 			case 2:
-				input.nextLine();
 				admin(input);
 				return;
 			case 3:
-				borr(input);
-				return;
+				try {
+					if(db.getBorrowers().size() > 0) {
+						borr(input);
+						return;
+					} else { 
+						System.out.println("There are no borrowers currently in the database.");
+						System.out.println("Please pick a different option.");
+						System.out.println();
+						getUserCat(input);
+						return;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					db.close();
+					return;
+				}
 			case 4:
-				db.close();
+				closeDatabase();
 				return;
 			default:
 				System.out.println("\'" + userCat + "\' is not a valid user category.");
@@ -81,7 +112,7 @@ public class Main {
 		System.out.println();
 		int selection = 0;
 		try {
-			selection = input.nextInt();
+			selection = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			lib1(input);
@@ -113,7 +144,7 @@ public class Main {
 			branches = db.getBranches();   
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -125,7 +156,7 @@ public class Main {
 		System.out.println();
 		int branchId = 0;
 		try{
-			branchId = input.nextInt();
+			branchId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			lib2(input);
@@ -141,6 +172,8 @@ public class Main {
 			System.out.println("\'" + branchId + "\' is not a valid branch.");
 			System.out.println("Please select your branch:");
 			System.out.println();
+			lib2(input);
+			return;
 		}
 	}
 	
@@ -159,7 +192,7 @@ public class Main {
 		System.out.println("");
 		int selection = 0; 
 		try {
-			selection = input.nextInt();
+			selection = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			lib3(input, branchId);
@@ -195,15 +228,14 @@ public class Main {
 			branch = db.getBranch(branchId);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		String branchName = branch.getBranchName();
 		String branchAddress = branch.getBranchAddress();
 		System.out.println("You have chosen to update the Branch with Branch Id: " + branchId + " and Branch Name: " + branchName + ".");
 		System.out.println();
-		System.out.println("Please enter new branch name or enter N/A for no change:");
-		input.nextLine();
+		System.out.println("Please enter a new branch name or enter N/A for no change:");
 		String newBranchName = input.nextLine();
 		System.out.println("Please enter a new branch address or enter N/A for no change:");
 		String newBranchAddress = input.nextLine();
@@ -218,7 +250,7 @@ public class Main {
 			db.updateBranch(branchId, newBranchName, newBranchAddress);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -237,7 +269,7 @@ public class Main {
 			books = db.getBooks();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		
@@ -255,7 +287,7 @@ public class Main {
 				}				
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 			System.out.println("\t" + (i+1) + ". " + books.get(i).getTitle() + " by " + authorName);
@@ -264,7 +296,7 @@ public class Main {
 		System.out.println();
 		int bookId = 0;
 		try {
-			bookId = input.nextInt();
+			bookId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			libAddBook(input, branchId);
@@ -302,7 +334,7 @@ public class Main {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		System.out.println();
@@ -312,7 +344,7 @@ public class Main {
 		System.out.println();
 		int newNumCopies = 0;
 		try {
-			newNumCopies = input.nextInt();
+			newNumCopies = Integer.parseInt(input.nextLine());
 		}catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			getNumCopies(input, branchId, bookId);
@@ -327,7 +359,7 @@ public class Main {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -343,10 +375,11 @@ public class Main {
 		System.out.println("Enter your Card Number:");
 		int cardNo = 0;
 		try {
-			cardNo = input.nextInt();
+			cardNo = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			borr(input);
+			return;
 		}	
 		try {
 			Borrower borr = db.getBorrower(cardNo);
@@ -360,7 +393,7 @@ public class Main {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 	}
@@ -377,7 +410,7 @@ public class Main {
 		System.out.println();
 		int selection = 0;
 		try {
-			selection = input.nextInt();
+			selection = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			borr1(input, cardNo);
@@ -413,7 +446,7 @@ public class Main {
 			branches = db.getBranches();   
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 
@@ -427,7 +460,7 @@ public class Main {
 		
 		int branchId = 0;
 		try{
-			branchId = input.nextInt();
+			branchId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			borrCheckOutBranch(input, cardNo);
@@ -458,14 +491,18 @@ public class Main {
 			books = db.getBooks();
 			for(int i = 0; i < books.size(); i++) {
 				BookCopy bc = db.getBookCopy(branchId, books.get(i).getBookId());
+				Loan l = db.getBookLoan(branchId, books.get(i).getBookId(), cardNo);
 				if(bc == null || bc.getNoOfCopies() == 0) {
+					books.remove(i);
+					i--;
+				} else if (l != null){
 					books.remove(i);
 					i--;
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}				
 		
@@ -483,7 +520,7 @@ public class Main {
 				}				
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 			System.out.println("\t" + (i+1) + ". " + books.get(i).getTitle() + " by " + authorName);
@@ -492,7 +529,7 @@ public class Main {
 		System.out.println();
 		int bookId = 0;
 		try {
-			bookId = input.nextInt();
+			bookId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			borrCheckOutBook(input, cardNo, branchId);
@@ -503,7 +540,7 @@ public class Main {
 				db.addBookLoan(branchId, books.get(bookId - 1).getBookId(), cardNo);
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(bookId == (books.size()+1)) {
@@ -530,7 +567,7 @@ public class Main {
 			branches = db.getBranches();   
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 
@@ -544,7 +581,7 @@ public class Main {
 		
 		int branchId = 0;
 		try{
-			branchId = input.nextInt();
+			branchId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			borrReturnBranch(input, cardNo);
@@ -582,7 +619,7 @@ public class Main {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}				
 		
@@ -608,7 +645,7 @@ public class Main {
 				}				
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 			System.out.println("\t" + (i+1) + ". " + books.get(i).getTitle() + " by " + authorName);
@@ -618,7 +655,7 @@ public class Main {
 		
 		int bookId = 0;
 		try {
-			bookId = input.nextInt();
+			bookId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			borrReturnBook(input, cardNo, branchId);
@@ -629,7 +666,7 @@ public class Main {
 				db.deleteBookLoan(branchId, books.get(bookId - 1).getBookId(), cardNo);
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(bookId == (books.size()+1)) {
@@ -680,7 +717,7 @@ public class Main {
 		System.out.println();
 		int selection = 0;
 		try {
-			selection = input.nextInt();
+			selection = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			admin1(input);
@@ -725,31 +762,26 @@ public class Main {
 		System.out.println();
 		int table = 0;
 		try {
-			table = input.nextInt();
+			table = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminAdd(input);
 			return;
 		}
 		switch(table) {
-			case 1:
-				input.nextLine();
+			case 1:				
 				adminAddBookTitle(input);
 				return;
-			case 2:
-				input.nextLine();
+			case 2:				
 				adminAddAuthor(input);
 				return;
-			case 3:
-				input.nextLine();
+			case 3:				
 				adminAddPublisher(input);
 				return;
-			case 4:
-				input.nextLine();
+			case 4:				
 				adminAddBranch(input);
 				return;
-			case 5:
-				input.nextLine();
+			case 5:				
 				adminAddBorrower(input);
 				return;
 			case 6:
@@ -778,7 +810,7 @@ public class Main {
 		System.out.println();
 		int table = 0;
 		try {
-			table = input.nextInt();
+			table = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminUpdate(input);
@@ -786,23 +818,18 @@ public class Main {
 		}
 		switch(table) {
 			case 1:
-				input.nextLine();
 				adminUpdateBook(input);
 				return;
-			case 2:
-				input.nextLine();
+			case 2:				
 				adminUpdateAuthor(input);
 				return;
-			case 3:
-				input.nextLine();
+			case 3:				
 				adminUpdatePublisher(input);
 				return;
-			case 4:
-				input.nextLine();
+			case 4:				
 				adminUpdateBranch(input);
 				return;
 			case 5:
-				input.nextLine();
 				adminUpdateBorrower(input);
 				return;
 			case 6:
@@ -831,7 +858,7 @@ public class Main {
 		System.out.println();
 		int table = 0;
 		try {
-			table = input.nextInt();
+			table = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminDelete(input);
@@ -905,7 +932,7 @@ public class Main {
 				}
 			} catch(Exception e){
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		}
@@ -929,19 +956,27 @@ public class Main {
 				if(pub != null) {
 					db.addBook(title, authorId, pub.getPublisherId());
 				} else {
-					System.out.println("Could not find an publisher with the name: " + publisher);
+					System.out.println("Could not find a publisher with the name: " + publisher);
 					System.out.println("Please input a different name or quit and add them to the publisher table first.");
-					adminAddBookAuthor(input, title);
+					adminAddBookPublisher(input, title, authorId);
 					return;
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		}
-		adminAdd(input);
-		return;
+		
+		System.out.println("Would you like to add another book (y):");
+		String response = input.nextLine();
+		if("Y".equals(response.toUpperCase()) || "YES".equals(response.toUpperCase())) {
+			adminAddBookTitle(input);
+			return;
+		} else {
+			adminAdd(input);
+			return;
+		}
 	}
 
 	/**
@@ -952,11 +987,16 @@ public class Main {
 		System.out.println("What is the name of the author (enter \'quit\' to quit):");
 		String authorName = input.nextLine();
 		
+		if("QUIT".equals(authorName.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
+		
 		try {
 			db.addAuthor(authorName);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -977,17 +1017,31 @@ public class Main {
 	 */
 	public static void adminAddPublisher(Scanner input) {
 		System.out.println("What is the name of the publisher (enter \'quit\' to quit):");
-		String publisherName = input.nextLine();
+		String publisherName = input.nextLine();		
+		if("QUIT".equals(publisherName.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
+		
 		System.out.println("What is the address of the publisher (enter \'quit\' to quit):");
-		String publisherAddress = input.nextLine();
+		String publisherAddress = input.nextLine();		
+		if("QUIT".equals(publisherAddress.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
+		
 		System.out.println("What is the phone number of the publisher (enter \'quit\' to quit):");
 		String publisherPhoneNumber = input.nextLine();
+		if("QUIT".equals(publisherPhoneNumber.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
 		
 		try {
 			db.addPublisher(publisherName, publisherAddress, publisherPhoneNumber);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1009,14 +1063,23 @@ public class Main {
 	public static void adminAddBranch(Scanner input) {
 		System.out.println("What is the name of the branch (enter \'quit\' to quit):");
 		String branchName = input.nextLine();
+		if("QUIT".equals(branchName.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
+		
 		System.out.println("What is the address of the branch (enter \'quit\' to quit):");
 		String branchAddress = input.nextLine();
+		if("QUIT".equals(branchAddress.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
 		
 		try {
 			db.addBranch(branchName, branchAddress);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1038,18 +1101,30 @@ public class Main {
 	public static void adminAddBorrower(Scanner input) {
 		System.out.println("What is the name of the borrower (enter \'quit\' to quit):");
 		String borrowerName = input.nextLine();
+		if("QUIT".equals(borrowerName.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
+		
 		System.out.println("What is the address of the borrower (enter \'quit\' to quit):");
 		String borrowerAddress = input.nextLine();
+		if("QUIT".equals(borrowerAddress.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
+		
 		System.out.println("What is the phone number of the borrower (enter \'quit\' to quit):");
 		String borrowerPhoneNumber = input.nextLine();
+		if("QUIT".equals(borrowerPhoneNumber.toUpperCase())) {
+			adminAdd(input);
+			return;
+		}
 		
 		try {
-			int cardNo = db.addBorrower(borrowerName, borrowerAddress, borrowerPhoneNumber);
-			System.out.println("The card number for this new borrower is " + cardNo);
-			System.out.println();
+			db.addBorrower(borrowerName, borrowerAddress, borrowerPhoneNumber);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1074,7 +1149,7 @@ public class Main {
 			books = db.getBooks();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		
@@ -1092,7 +1167,7 @@ public class Main {
 				}				
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 			System.out.println("\t" + (i+1) + ". " + books.get(i).getTitle() + " by " + authorName);
@@ -1101,14 +1176,13 @@ public class Main {
 		System.out.println();
 		int bookId = 0;
 		try {
-			bookId = input.nextInt();
+			bookId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminUpdateBook(input);
 			return;
 		}
-		if(bookId > 0 && bookId <= books.size()) {
-			input.nextLine();
+		if(bookId > 0 && bookId <= books.size()) {			
 			adminUpdateBookInput(input, books.get(bookId - 1).getBookId());
 			return;
 		} else if(bookId == (books.size()+1)) {
@@ -1140,7 +1214,7 @@ public class Main {
 			bookPublisher = pub.getPublisherName();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		System.out.println("You have chosen to update the Book: " + bookName + " by " + bookAuthor + ", published by " + bookPublisher + ".");
@@ -1159,35 +1233,33 @@ public class Main {
 			}
 			if("N/A".equals(newBookAuthor.toUpperCase())) {
 				newBookAuthor = bookAuthor;
-			} else {
-				Author auth = db.getAuthor(newBookAuthor);
-				if(auth == null) {
-					System.out.println("Could not find an author with the name " + newBookAuthor);
-					System.out.println("Please input a different name or quit and add them to the author table first.");
-					adminUpdateBookInput(input, bookId);
-					return;
-				} else {
-					authId = auth.getAuthorId();
-				}
 			}
-			if("N/A".equals(newBookPublisher.toUpperCase())) {
-				newBookPublisher = bookPublisher;
+			Author auth = db.getAuthor(newBookAuthor);
+			if(auth == null) {
+				System.out.println("Could not find an author with the name " + newBookAuthor);
+				System.out.println("Please input a different name or quit and add them to the author table first.");
+				adminUpdateBookInput(input, bookId);
+				return;
 			} else {
-				Publisher pub = db.getPublisher(newBookPublisher);
-				if(pub == null) {
-					System.out.println("Could not find a publisher with the name " + newBookPublisher);
-					System.out.println("Please input a different name or quit and add them to the publisher table first.");
-					adminUpdateBookInput(input, bookId);
-					return;
-				} else {
-					pubId = pub.getPublisherId();
-				}
+				authId = auth.getAuthorId();
 			}
 			
+			if("N/A".equals(newBookPublisher.toUpperCase())) {
+				newBookPublisher = bookPublisher;
+			}
+			Publisher pub = db.getPublisher(newBookPublisher);
+			if(pub == null) {
+				System.out.println("Could not find a publisher with the name " + newBookPublisher);
+				System.out.println("Please input a different name or quit and add them to the publisher table first.");
+				adminUpdateBookInput(input, bookId);
+				return;
+			} else {
+				pubId = pub.getPublisherId();
+			}
 			db.updateBook(bookId, newBookName, authId, pubId);
 		} catch(Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1206,7 +1278,7 @@ public class Main {
 			authors = db.getAuthors();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}	
 		
@@ -1220,14 +1292,13 @@ public class Main {
 		System.out.println();
 		int authorId = 0;
 		try {
-			authorId = input.nextInt();
+			authorId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminUpdateAuthor(input);
 			return;
 		}
-		if(authorId > 0 && authorId <= authors.size()) {
-			input.nextLine();
+		if(authorId > 0 && authorId <= authors.size()) {			
 			adminUpdateAuthorInput(input, authors.get(authorId-1).getAuthorId());
 			return;
 		} else if(authorId == (authors.size()+1)) {
@@ -1252,7 +1323,7 @@ public class Main {
 			authorName = auth.getAuthorName();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		System.out.println("You have chosen to update the Author: " + authorName + ".");
@@ -1267,7 +1338,7 @@ public class Main {
 			db.updateAuthor(authorId, newAuthorName);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1285,7 +1356,7 @@ public class Main {
 			publishers = db.getPublishers();
 		} catch (Exception e){
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		
@@ -1299,14 +1370,13 @@ public class Main {
 		System.out.println();
 		int publisherId = 0;
 		try {
-			publisherId = input.nextInt();
+			publisherId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminUpdatePublisher(input);
 			return;
 		}
-		if(publisherId > 0 && publisherId <= publishers.size()) {
-			input.nextLine();
+		if(publisherId > 0 && publisherId <= publishers.size()) {			
 			adminUpdatePublisherInput(input, publishers.get(publisherId - 1).getPublisherId());
 			return;
 		} else if(publisherId == (publishers.size()+1)) {
@@ -1335,7 +1405,7 @@ public class Main {
 			publisherPhone = pub.getPublisherPhone();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		System.out.println("You have chosen to update the Publisher: " + publisherName + ", " + publisherAddress + " - " + publisherPhone + ".");
@@ -1360,7 +1430,7 @@ public class Main {
 			db.updatePublisher(publisherId, newPublisherName, newPublisherAddress, newPublisherPhone);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1378,7 +1448,7 @@ public class Main {
 			branches = db.getBranches();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1392,14 +1462,13 @@ public class Main {
 		System.out.println();
 		int branchId = 0;
 		try {
-			branchId = input.nextInt();
+			branchId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminUpdateBranch(input);
 			return;
 		}
-		if(branchId > 0 && branchId <= branches.size()) {
-			input.nextLine();
+		if(branchId > 0 && branchId <= branches.size()) {			
 			adminUpdateBranchInput(input, branches.get(branchId-1).getBranchId());
 			return;
 		} else if(branchId == (branches.size()+1)) {
@@ -1426,12 +1495,12 @@ public class Main {
 			branchAddress = b.getBranchAddress();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		System.out.println("You have chosen to update the Branch: " + branchName + ", " + branchAddress + ".");
 		System.out.println();
-		System.out.println("Please enter new branch name or enter N/A for no change:");
+		System.out.println("Please enter a new branch name or enter N/A for no change:");
 		String newBranchName = input.nextLine();
 		System.out.println("Please enter a new branch address or enter N/A for no change:");
 		String newBranchAddress = input.nextLine();
@@ -1446,7 +1515,7 @@ public class Main {
 			db.updateBranch(branchId, newBranchName, newBranchAddress);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1464,7 +1533,7 @@ public class Main {
 			borrowers = db.getBorrowers();
 		}catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1478,14 +1547,13 @@ public class Main {
 		System.out.println();
 		int borrowerId = 0;
 		try {
-			borrowerId = input.nextInt();
+			borrowerId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminUpdateBorrower(input);
 			return;
 		}
-		if(borrowerId > 0 && borrowerId <= borrowers.size()) {
-			input.nextLine();
+		if(borrowerId > 0 && borrowerId <= borrowers.size()) {			
 			adminUpdateBorrowerInput(input, borrowers.get(borrowerId-1).getCardNo());
 			return;
 		} else if(borrowerId == (borrowers.size()+1)) {
@@ -1514,7 +1582,7 @@ public class Main {
 			borrowerPhone = borr.getPhone();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		System.out.println("You have chosen to update the Borrower: " + borrowerName + ", " + borrowerAddress + " - " + borrowerPhone + ".");
@@ -1539,7 +1607,7 @@ public class Main {
 			db.updateBorrower(cardNo, newBorrowerName, newBorrowerAddress, newBorrowerPhone);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1557,7 +1625,7 @@ public class Main {
 			books = db.getBooks();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		
@@ -1575,7 +1643,7 @@ public class Main {
 				}				
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 			System.out.println("\t" + (i+1) + ". " + books.get(i).getTitle() + " by " + authorName);
@@ -1584,7 +1652,7 @@ public class Main {
 		System.out.println();
 		int bookId = 0;
 		try {
-			bookId = input.nextInt();
+			bookId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminDeleteBook(input);
@@ -1595,7 +1663,7 @@ public class Main {
 				db.deleteBook(books.get(bookId-1).getBookId());
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(bookId == (books.size()+1)) {
@@ -1620,7 +1688,7 @@ public class Main {
 			authors = db.getAuthors();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		
@@ -1634,7 +1702,7 @@ public class Main {
 		System.out.println();
 		int authorId = 0;
 		try {
-			authorId = input.nextInt();
+			authorId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminDeleteAuthor(input);
@@ -1645,7 +1713,7 @@ public class Main {
 				db.deleteAuthor(authors.get(authorId-1).getAuthorId());
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(authorId == (authors.size()+1)) {
@@ -1670,7 +1738,7 @@ public class Main {
 			publishers = db.getPublishers();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}		
 		
@@ -1684,7 +1752,7 @@ public class Main {
 		System.out.println();
 		int publisherId = 0;
 		try {
-			publisherId = input.nextInt();
+			publisherId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminDeletePublisher(input);
@@ -1695,7 +1763,7 @@ public class Main {
 				db.deletePublisher(publishers.get(publisherId-1).getPublisherId());
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(publisherId == (publishers.size()+1)) {
@@ -1720,7 +1788,7 @@ public class Main {
 			branches = db.getBranches();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1734,7 +1802,7 @@ public class Main {
 		System.out.println();
 		int branchId = 0;
 		try {
-			branchId = input.nextInt();
+			branchId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminDeleteBranch(input);
@@ -1745,7 +1813,7 @@ public class Main {
 				db.deleteBranch(branches.get(branchId-1).getBranchId());
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(branchId == (branches.size()+1)) {
@@ -1770,7 +1838,7 @@ public class Main {
 			borrowers = db.getBorrowers();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}	
 		
@@ -1784,7 +1852,7 @@ public class Main {
 		System.out.println();
 		int borrowerId = 0;
 		try {
-			borrowerId = input.nextInt();
+			borrowerId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminDeleteBorrower(input);
@@ -1795,7 +1863,7 @@ public class Main {
 				db.deleteBorrower(borrowers.get(borrowerId-1).getCardNo());
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
 		} else if(borrowerId == (borrowers.size()+1)) {
@@ -1820,7 +1888,7 @@ public class Main {
 			loans = db.getLoans();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
@@ -1835,15 +1903,15 @@ public class Main {
 				System.out.println("\t" + (i+1) + ". " + bk.getTitle() + "; From: " + bch.getBranchName() + "; By: " + borr.getName() + "; (" + loans.get(i).getDateOut() + " --- " + loans.get(i).getDueDate() + ")");                                     
 			} catch (Exception e) {
 				e.printStackTrace();
-				db.close();
+				closeDatabase();
 				return;
 			}
-			}
+		}
 		System.out.println("\t" + (i+1) + ". Quit to previous");
 		System.out.println();
 		int loanId = 0;
 		try {
-			loanId = input.nextInt();
+			loanId = Integer.parseInt(input.nextLine());
 		} catch (Exception e) {
 			System.out.println("That is not a valid integer.");
 			adminOverrideDueDate(input);
@@ -1888,7 +1956,7 @@ public class Main {
 			dueDate = l.getDueDate();
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		System.out.println("You have chosen to override the due date of " + bookName + ", loaned from " + branchName + " by " + borrowerName + ".");
@@ -1899,7 +1967,7 @@ public class Main {
 			db.overrideDueDate(bookId, branchId, cardNo);
 		} catch (Exception e) {
 			e.printStackTrace();
-			db.close();
+			closeDatabase();
 			return;
 		}
 		
