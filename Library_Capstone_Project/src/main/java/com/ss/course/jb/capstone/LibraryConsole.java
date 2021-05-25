@@ -34,7 +34,7 @@ public class LibraryConsole {
 	}
 	
 	/**
-	 * Print a welcome message and then call the getUserCat method to prompt the user for their category
+	 * Call initDatabase to intialize the database and then call startConsole to start the application
 	 * @param args - Command Line arguments (unused)
 	 */
 	public static void main(String[] args) {
@@ -42,6 +42,9 @@ public class LibraryConsole {
 		startConsole();
 	}
 	
+	/**
+	 * Print a welcome message and then call the getUserCat method to prompt the user for their category
+	 */
 	public static void startConsole() {
 		System.out.print("Welcome to the GCIT Library Management System. ");
 		getUserCat(new Scanner(System.in));
@@ -1975,6 +1978,3 @@ public class LibraryConsole {
 		return;
 	}
 }  
-
-
-

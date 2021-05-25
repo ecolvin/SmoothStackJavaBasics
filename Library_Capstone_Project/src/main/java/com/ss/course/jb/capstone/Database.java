@@ -263,7 +263,6 @@ public class Database {
 		}
 	}
 
-	
 	/**
 	 * Updates the specified entry in the tbl_author table to the specified values
 	 * @param authorId - The Primary Key of the entry to be updated
@@ -283,7 +282,6 @@ public class Database {
 			throw e;
 		}
 	}
-
 	
 	/**
 	 * Deletes the specified entry from the tbl_author table
@@ -302,7 +300,6 @@ public class Database {
 		}
 	}
 
-	
 	/**
 	 * Retrieves the query of all entries in tbl_publisher and turns it into an ArrayList of Publishers and returns it
 	 * @return - ArrayList of Publisher objects retrieved from the database
@@ -326,7 +323,6 @@ public class Database {
 		}
 	}
 
-	
 	/**
 	 * Queries the database for a publisher with the specified publisherId and returns it
 	 * @param publisherId - The publisherId for the query
@@ -351,7 +347,6 @@ public class Database {
 		}
 	}
 
-	
 	/**
 	 * Queries the database for a publisher with the specified name and returns it
 	 * @param publisherName - The publisherName for the query
@@ -377,7 +372,6 @@ public class Database {
 		}
 	}
 
-	
 	/**
 	 * Adds an entry to the tbl_publisher table with the specified values and a publisherId one larger than the current max publisherId
 	 * @param name - The name of the new publisher
@@ -411,7 +405,6 @@ public class Database {
 		}
 	}
 
-	
 	/**
 	 * Updates the specified entry in the tbl_publisher table to the specified values
 	 * @param publisherId - The Primary Key of the entry to be updated
@@ -435,7 +428,6 @@ public class Database {
 			throw e;
 		}
 	}
-
 	
 	/**
 	 * Deletes the specified entry from the tbl_publisher table
@@ -453,7 +445,6 @@ public class Database {
 			throw e;
 		}
 	}
-
 	
 	/**
 	 * Retrieves the query of all entries in tbl_library_branch and turns it into an ArrayList of Branch objects and returns it
@@ -476,7 +467,6 @@ public class Database {
 			throw e;
 		}
 	}
-
 	
 	/**
 	 * Queries the database for a branch with the specified branchId and returns it
@@ -501,7 +491,6 @@ public class Database {
 		}
 	}
 	
-
 	/**
 	 * Adds an entry to the tbl_library_branch table with the specified values and a branchId one larger than the current max branchId
 	 * @param name - The name of the new branch
